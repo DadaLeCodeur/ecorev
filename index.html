@@ -1146,7 +1146,8 @@ nav {
 
 <style>
 /* ═══ CARTE ═══ */
-#page-carte { padding: 0; overflow: hidden; height: calc(100vh - 58px); display: flex; flex-direction: column; }
+#page-carte { padding: 0; overflow: hidden; height: calc(100vh - 58px); display: none !important; }
+#page-carte.active { display: flex !important; flex-direction: column; }
 #carte-container { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
 #carte-header { padding: 18px 28px 12px; flex-shrink: 0; border-bottom: 1px solid var(--border); background: var(--bg); }
 #carte-main-title { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; margin:0 0 10px; }
@@ -1294,7 +1295,7 @@ function goCompte() { showPage('compte'); renderCompte(); }
 
 function goClassement() { showPage('classement'); loadClassement(); }
 
-function goCarte() { showPage('carte'); initCarte(); }
+function goCarte() { showPage('carte'); initCarte(); drawMapIfNeeded(); }
 
 function goDefinitions() { showPage('definitions'); renderAllDefinitions(); }
 
@@ -3988,6 +3989,9 @@ const METRIC_CONFIG = {
   pop:       { label: 'Population', unit: 'M', scale: [0.5, 1500], colors: ['#1c1917','#44403c','#78716c','#d6d3d1','#f5f5f4'], fmt: v => v >= 1000 ? `${(v/1000).toFixed(1)}Md` : `${v}M` },
 };
 
+let geoDataLoaded = false;
+let mapDrawn = false;
+
 function initCarte() {
   if (carteInitialized) return;
   carteInitialized = true;
@@ -4001,12 +4005,23 @@ async function loadWorldMap() {
     const world = await response.json();
     const topojson = window.topojson || await loadTopojson();
     worldGeoData = topojson.feature(world, world.objects.countries);
-    drawMap();
-    document.getElementById('map-loading').style.display = 'none';
-    renderLegend();
+    geoDataLoaded = true;
+    drawHomeGlobe();
+    // Only draw the full map if carte page is currently visible
+    if (document.getElementById('page-carte').classList.contains('active')) {
+      drawMapIfNeeded();
+    }
   } catch(e) {
     document.getElementById('map-loading').innerHTML = `<p style="color:var(--muted)">⚠️ Impossible de charger la carte. Vérifie ta connexion.</p>`;
   }
+}
+
+function drawMapIfNeeded() {
+  if (!geoDataLoaded || mapDrawn) return;
+  mapDrawn = true;
+  drawMap();
+  document.getElementById('map-loading').style.display = 'none';
+  renderLegend();
 }
 
 function loadTopojson() {
@@ -4129,6 +4144,71 @@ function getColor(a3) {
   const [mn, mx] = cfg.scale;
   const t = Math.max(0, Math.min(1, (val - mn) / (mx - mn)));
   return d3.interpolateRgbBasis(cfg.colors)(t);
+}
+
+function drawHomeGlobe() {
+  const wrap = document.getElementById('home-globe-wrap');
+  if (!wrap || !worldGeoData) return;
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  if (w === 0 || h === 0) return;
+  const svg = d3.select('#home-globe-svg').attr('viewBox', `0 0 ${w} ${h}`);
+  svg.selectAll('*').remove();
+
+  const scale = Math.min(w, h) * 0.42;
+  let rotation = [0, -20, 0];
+
+  const projection = d3.geoOrthographic()
+    .scale(scale)
+    .translate([w / 2, h / 2])
+    .rotate(rotation)
+    .clipAngle(90);
+
+  const path = d3.geoPath().projection(projection);
+
+  // Ocean
+  svg.append('circle')
+    .attr('cx', w/2).attr('cy', h/2).attr('r', scale)
+    .attr('fill', '#061525');
+
+  // Graticule
+  const graticule = d3.geoGraticule().step([20, 20]);
+  const gratPath = svg.append('path')
+    .datum(graticule())
+    .attr('fill', 'none')
+    .attr('stroke', '#0d2540')
+    .attr('stroke-width', '0.5')
+    .attr('d', path);
+
+  // Countries
+  const countryPaths = svg.append('g').selectAll('path')
+    .data(worldGeoData.features)
+    .join('path')
+    .attr('fill', d => getColor(getCountryA3(d)))
+    .attr('stroke', '#0a1628')
+    .attr('stroke-width', 0.3)
+    .attr('d', path);
+
+  // Border
+  svg.append('circle')
+    .attr('cx', w/2).attr('cy', h/2).attr('r', scale)
+    .attr('fill', 'none')
+    .attr('stroke', '#1a4a7a')
+    .attr('stroke-width', 1)
+    .attr('pointer-events', 'none');
+
+  // Auto-rotate (only when home page is visible)
+  function spin() {
+    if (!document.getElementById('page-home').classList.contains('active')) {
+      requestAnimationFrame(spin);
+      return;
+    }
+    rotation[0] += 0.3;
+    projection.rotate(rotation);
+    gratPath.attr('d', path);
+    countryPaths.attr('d', path);
+    requestAnimationFrame(spin);
+  }
+  spin();
 }
 
 function drawMap() {
