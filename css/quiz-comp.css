@@ -1,0 +1,202 @@
+/* --- QUIZ COMPETITIF --- */
+
+.comp-container {
+  min-height: calc(100vh - var(--nav-h));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+}
+.comp-screen { display: none; width: 100%; max-width: 700px; margin: 0 auto; }
+.comp-screen.active { display: flex; flex-direction: column; align-items: center; }
+
+/* -- Ready Circle -- */
+.comp-ready-circle {
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--a1), var(--a5));
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 0 60px rgba(91,141,238,0.25);
+  animation: comp-pulse 2s ease-in-out infinite;
+}
+.comp-ready-circle:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 80px rgba(91,141,238,0.45);
+}
+.comp-ready-inner { text-align: center; }
+.comp-ready-icon { font-size: 48px; margin-bottom: 8px; }
+.comp-ready-text { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: #fff; }
+.comp-ready-sub { font-size: 13px; color: rgba(255,255,255,.7); margin-top: 4px; }
+@keyframes comp-pulse {
+  0%, 100% { box-shadow: 0 0 60px rgba(91,141,238,0.25); }
+  50% { box-shadow: 0 0 80px rgba(91,141,238,0.45); }
+}
+
+/* -- Rules -- */
+.comp-rules-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+.comp-rules-box h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin: 0 0 24px; }
+.comp-rules-list { text-align: left; margin: 0 0 24px; }
+.comp-rule { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.comp-rule:last-child { border-bottom: none; }
+.comp-rule-icon { font-size: 20px; flex-shrink: 0; }
+.comp-start-btn {
+  background: linear-gradient(135deg, var(--a1), var(--a5));
+  color: #fff; border: none; border-radius: 12px;
+  padding: 14px 36px; font-family: 'Syne', sans-serif;
+  font-size: 16px; font-weight: 700; cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.comp-start-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(91,141,238,.3); }
+
+/* -- Countdown -- */
+.comp-countdown { display: flex; align-items: center; justify-content: center; min-height: 260px; }
+.comp-countdown span { font-family: 'Syne', sans-serif; font-size: 100px; font-weight: 800; color: var(--a1); }
+.comp-cd-animate { animation: comp-pop 0.6s ease-out; }
+@keyframes comp-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* -- HUD -- */
+.comp-hud {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; margin-bottom: 16px;
+  padding: 14px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.comp-heart { font-size: 22px; margin-right: 3px; transition: transform 0.3s, filter 0.3s; }
+.comp-heart.lost { filter: grayscale(1); opacity: 0.25; transform: scale(0.85); }
+.comp-score-display {
+  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--a2);
+  position: relative;
+}
+.comp-streak-display { font-size: 14px; color: var(--muted); }
+.comp-best-streak { font-size: 12px; opacity: 0.7; }
+.comp-points-popup {
+  position: absolute; top: -20px; right: 0;
+  font-size: 14px; font-weight: 800; color: var(--a3);
+  animation: comp-float-up 0.8s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes comp-float-up {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-24px); }
+}
+
+/* -- Timer -- */
+.comp-timer-wrap { position: relative; width: 120px; height: 120px; margin: 8px auto 16px; }
+.comp-timer-svg { width: 120px; height: 120px; transform: rotate(-90deg); }
+.comp-timer-bg { fill: none; stroke: var(--surface2); stroke-width: 8; }
+.comp-timer-progress {
+  fill: none; stroke: var(--a3); stroke-width: 8; stroke-linecap: round;
+  stroke-dasharray: 339.292; stroke-dashoffset: 0;
+}
+.comp-timer-progress.timer-danger { stroke: var(--a4); }
+.comp-timer-text {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--text);
+}
+.comp-timer-text.danger { color: var(--a4); }
+
+/* -- Question -- */
+.comp-q-counter { font-size: 12px; color: var(--muted); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.comp-question {
+  font-size: 17px; font-weight: 600; text-align: center;
+  margin: 0 0 20px; line-height: 1.5; max-width: 600px;
+}
+.comp-options { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.comp-opt {
+  display: block; width: 100%;
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: 12px; padding: 14px 18px;
+  color: var(--text); font-size: 14px; text-align: left;
+  cursor: pointer; transition: all 0.15s;
+  font-family: inherit;
+}
+.comp-opt:hover { border-color: var(--a1); background: rgba(91,141,238,.06); }
+.comp-opt.correct { border-color: var(--a3); background: rgba(82,212,160,.12); color: var(--a3); font-weight: 600; }
+.comp-opt.wrong { border-color: var(--a4); background: rgba(240,112,112,.1); color: var(--a4); }
+.comp-opt.disabled { pointer-events: none; opacity: 0.85; }
+
+/* -- Game Over -- */
+.comp-gameover-box { text-align: center; width: 100%; }
+.comp-gameover-icon {
+  font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800;
+  color: var(--a4); margin-bottom: 28px;
+  animation: comp-pop 0.6s ease-out;
+}
+.comp-gameover-stats { display: flex; gap: 32px; justify-content: center; margin: 24px 0; }
+.comp-stat { text-align: center; }
+.comp-stat-val { font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; color: var(--a1); }
+.comp-stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.comp-new-record {
+  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700;
+  color: var(--a2); margin: 16px 0;
+  animation: comp-pop 0.6s ease-out;
+}
+.comp-gameover-actions { display: flex; gap: 12px; justify-content: center; margin-top: 28px; }
+.comp-retry-btn {
+  background: linear-gradient(135deg, var(--a1), var(--a5));
+  color: #fff; border: none; border-radius: 12px;
+  padding: 14px 28px; font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 15px; cursor: pointer;
+  transition: transform 0.15s;
+}
+.comp-retry-btn:hover { transform: translateY(-2px); }
+.comp-home-btn {
+  background: var(--surface2); color: var(--text);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px 28px; font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 15px; cursor: pointer;
+  transition: transform 0.15s;
+}
+.comp-home-btn:hover { transform: translateY(-2px); }
+
+/* -- Nav button -- */
+.nav-btn-comp {
+  background: linear-gradient(135deg, #f59e0b, #ef4444) !important;
+  color: #fff !important; border-radius: 20px !important;
+  padding: 5px 14px !important; font-weight: 700 !important;
+  border: none !important; font-size: 12px !important;
+}
+
+/* -- Classement tabs -- */
+.classement-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.cl-tab {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--muted); border-radius: 10px; padding: 10px 20px;
+  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+}
+.cl-tab.active { background: var(--a1); color: #fff; border-color: var(--a1); }
+.cl-tab:hover:not(.active) { border-color: var(--a1); color: var(--text); }
+
+/* -- Mobile responsive -- */
+@media (max-width: 600px) {
+  .comp-ready-circle { width: 200px; height: 200px; }
+  .comp-ready-icon { font-size: 36px; }
+  .comp-ready-text { font-size: 26px; }
+  .comp-gameover-stats { flex-direction: column; gap: 16px; }
+  .comp-stat-val { font-size: 32px; }
+  .comp-hud { flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .comp-timer-wrap { width: 100px; height: 100px; }
+  .comp-timer-svg { width: 100px; height: 100px; }
+  .comp-timer-text { font-size: 26px; }
+  .comp-rules-box { padding: 24px 20px; }
+  .comp-question { font-size: 15px; }
+  .classement-tabs { flex-wrap: wrap; }
+}

@@ -14,6 +14,7 @@
 <!-- CSS -->
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/carte.css">
+<link rel="stylesheet" href="css/quiz-comp.css">
 </head>
 <body>
 
@@ -43,40 +44,46 @@
 
 <!-- ══ NAV ══ -->
 <nav>
-  <a class="nav-logo" onclick="goHome()"><img src="logo.png" alt="ÉcoRev"></a>
+  <div class="nav-row nav-row-main">
+    <a class="nav-logo" onclick="goHome()"><img src="logo.png" alt="ÉcoRev"></a>
 
-  <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileMenu()">
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-  </button>
+    <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileMenu()">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
 
-  <div class="nav-center">
-    <div class="nav-dropdown">
-      <button class="nav-btn">📚 Chapitres <span class="dropdown-chevron">▼</span></button>
-      <div class="dropdown-menu" id="chapters-dropdown"></div>
+    <div class="nav-center">
+      <div class="nav-dropdown">
+        <button class="nav-btn">📚 Chapitres <span class="dropdown-chevron">▼</span></button>
+        <div class="dropdown-menu" id="chapters-dropdown"></div>
+      </div>
+      <div class="nav-dropdown">
+        <button class="nav-btn">📐 Thèmes <span class="dropdown-chevron">▼</span></button>
+        <div class="dropdown-menu" style="min-width:200px">
+          <div class="dropdown-item" onclick="goTheme('macro')"><span>📊</span><span class="di-title">Macroéconomie</span></div>
+          <div class="dropdown-item" onclick="goTheme('micro')"><span>🏭</span><span class="di-title">Microéconomie</span></div>
+          <div class="dropdown-item" onclick="goTheme('monnaie')"><span>💰</span><span class="di-title">Monnaie & Finance</span></div>
+        </div>
+      </div>
+      <button class="nav-btn" onclick="goTheme('histoire')">📖 Économistes</button>
+      <button class="nav-btn nav-btn-defs" onclick="goDefinitions()">📚 Définitions</button>
     </div>
-    <div class="nav-dropdown">
-      <button class="nav-btn">📐 Thèmes <span class="dropdown-chevron">▼</span></button>
-      <div class="dropdown-menu" style="min-width:200px">
-        <div class="dropdown-item" onclick="goTheme('macro')"><span>📊</span><span class="di-title">Macroéconomie</span></div>
-        <div class="dropdown-item" onclick="goTheme('micro')"><span>🏭</span><span class="di-title">Microéconomie</span></div>
-        <div class="dropdown-item" onclick="goTheme('monnaie')"><span>💰</span><span class="di-title">Monnaie & Finance</span></div>
+
+    <div class="nav-right">
+      <div class="user-badge" id="user-badge">
+        <span>👤</span>
+        <span class="u-name" id="badge-name"></span>
+        <span class="u-score" id="badge-score"></span>
       </div>
     </div>
-    <button class="nav-btn" onclick="goTheme('histoire')">📖 Économistes</button>
-    <button class="nav-btn nav-btn-defs" onclick="goDefinitions()">📚 Définitions</button>
-    <button class="nav-btn nav-btn-monde" onclick="goCarte()">🌍 Carte Monde</button>
-    <button class="nav-btn nav-btn-compte" onclick="goCompte()">👤 Mon compte</button>
-    <button class="nav-btn nav-btn-classement" onclick="goClassement()">🏆 Classement</button>
   </div>
 
-  <div class="nav-right">
-    <div class="user-badge" id="user-badge">
-      <span>👤</span>
-      <span class="u-name" id="badge-name"></span>
-      <span class="u-score" id="badge-score"></span>
-    </div>
+  <div class="nav-row nav-row-secondary">
+    <button class="nav-btn nav-btn-monde" onclick="goCarte()">🌍 Carte Monde</button>
+    <button class="nav-btn nav-btn-classement" onclick="goClassement()">🏆 Classement</button>
+    <button class="nav-btn nav-btn-comp" onclick="goQuizComp()">⚔️ Quiz Compétitif</button>
+    <button class="nav-btn nav-btn-compte" onclick="goCompte()">👤 Mon compte</button>
   </div>
 </nav>
 
@@ -97,6 +104,7 @@
     <button class="mobile-menu-item mm-carte" onclick="closeMobileMenu();goCarte()">🌍 Carte Monde</button>
     <button class="mobile-menu-item mm-compte" onclick="closeMobileMenu();goCompte()">👤 Mon compte</button>
     <button class="mobile-menu-item mm-classement" onclick="closeMobileMenu();goClassement()">🏆 Classement</button>
+    <button class="mobile-menu-item mm-comp" onclick="closeMobileMenu();goQuizComp()">⚔️ Quiz Compétitif</button>
   </div>
   <div class="mobile-menu-section" id="mobile-chapters-section">
     <div class="mobile-menu-label">Chapitres</div>
@@ -259,6 +267,10 @@
       </div>
       <button onclick="loadClassement()" style="margin-left:auto;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif">↺ Actualiser</button>
     </div>
+    <div class="classement-tabs">
+      <button class="cl-tab active" id="cl-tab-normal" onclick="switchClassementTab('normal',this)">📚 Quiz Chapitres</button>
+      <button class="cl-tab" id="cl-tab-comp" onclick="switchClassementTab('comp',this)">⚔️ Quiz Compétitif</button>
+    </div>
     <div id="classement-loading" style="text-align:center;padding:60px;color:var(--muted)">
       <div style="font-size:32px;margin-bottom:12px">⏳</div>
       <div>Chargement du classement…</div>
@@ -268,6 +280,89 @@
       <div style="font-size:40px;margin-bottom:12px">🤷</div>
       <div style="font-size:15px">Aucun joueur trouvé.</div>
       <div style="font-size:13px;margin-top:8px">Réponds à des questions pour apparaître ici !</div>
+    </div>
+    <div id="classement-comp-list" style="display:none;flex-direction:column;gap:10px"></div>
+  </div>
+</div>
+
+<!-- QUIZ COMPÉTITIF -->
+<div id="page-quiz-comp" class="page">
+  <div class="comp-container">
+    <!-- Screen 1: Ready -->
+    <div id="comp-screen-ready" class="comp-screen active">
+      <div class="comp-ready-circle" onclick="showCompScreen('rules')">
+        <div class="comp-ready-inner">
+          <div class="comp-ready-icon">⚔️</div>
+          <div class="comp-ready-text">Prêt ?</div>
+          <div class="comp-ready-sub">Clique pour commencer</div>
+        </div>
+      </div>
+    </div>
+    <!-- Screen 2: Rules + Countdown -->
+    <div id="comp-screen-rules" class="comp-screen">
+      <div class="comp-rules-box">
+        <h2>⚔️ Règles du Quiz Compétitif</h2>
+        <div class="comp-rules-list">
+          <div class="comp-rule"><span class="comp-rule-icon">⏱️</span><span><strong>15 secondes</strong> pour répondre à chaque question</span></div>
+          <div class="comp-rule"><span class="comp-rule-icon">❤️</span><span><strong>3 vies</strong> — mauvaise réponse ou temps écoulé = −1 vie</span></div>
+          <div class="comp-rule"><span class="comp-rule-icon">🔥</span><span><strong>Série (streak)</strong> — enchaîne les bonnes réponses pour un bonus de points</span></div>
+          <div class="comp-rule"><span class="comp-rule-icon">🎯</span><span><strong>Score</strong> = 10 pts + 2 pts par niveau de série</span></div>
+        </div>
+        <button class="comp-start-btn" onclick="startCompCountdown()">C'est parti !</button>
+      </div>
+      <div id="comp-countdown" class="comp-countdown" style="display:none">
+        <span id="comp-countdown-num">3</span>
+      </div>
+    </div>
+    <!-- Screen 3: Quiz -->
+    <div id="comp-screen-quiz" class="comp-screen">
+      <div class="comp-hud">
+        <div class="comp-lives" id="comp-lives"></div>
+        <div class="comp-score-display" id="comp-score-display">
+          <span id="comp-score">0</span> pts
+        </div>
+        <div class="comp-streak-display">
+          🔥 <span id="comp-streak">0</span>
+          <span class="comp-best-streak">(max: <span id="comp-best-streak">0</span>)</span>
+        </div>
+      </div>
+      <div class="comp-timer-wrap">
+        <svg class="comp-timer-svg" viewBox="0 0 120 120">
+          <circle class="comp-timer-bg" cx="60" cy="60" r="54"/>
+          <circle class="comp-timer-progress" id="comp-timer-circle" cx="60" cy="60" r="54"/>
+        </svg>
+        <span class="comp-timer-text" id="comp-timer-text">15</span>
+      </div>
+      <div class="comp-q-counter">Question <span id="comp-q-count">1</span></div>
+      <div class="comp-question" id="comp-question"></div>
+      <div class="comp-options" id="comp-options"></div>
+    </div>
+    <!-- Screen 4: Game Over -->
+    <div id="comp-screen-gameover" class="comp-screen">
+      <div class="comp-gameover-box">
+        <div class="comp-gameover-icon">GAME OVER</div>
+        <div class="comp-gameover-stats">
+          <div class="comp-stat">
+            <div class="comp-stat-val" id="comp-final-score">0</div>
+            <div class="comp-stat-label">Score</div>
+          </div>
+          <div class="comp-stat">
+            <div class="comp-stat-val" id="comp-final-streak">0</div>
+            <div class="comp-stat-label">Meilleure série</div>
+          </div>
+          <div class="comp-stat">
+            <div class="comp-stat-val" id="comp-final-answered">0</div>
+            <div class="comp-stat-label">Questions</div>
+          </div>
+        </div>
+        <div id="comp-new-record" class="comp-new-record" style="display:none">
+          🏆 Nouveau record !
+        </div>
+        <div class="comp-gameover-actions">
+          <button class="comp-retry-btn" onclick="goQuizComp()">🔄 Rejouer</button>
+          <button class="comp-home-btn" onclick="goHome()">🏠 Accueil</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -333,6 +428,7 @@
 <script src="js/chatbot.js"></script>
 <script src="js/download.js"></script>
 <script src="js/chapters.js"></script>
+<script src="js/quiz-comp.js"></script>
 <script src="js/compte.js"></script>
 <script src="js/carte.js"></script>
 <script src="js/app.js"></script>
